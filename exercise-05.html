@@ -107,10 +107,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.2.0     ✔ readr     2.2.0
+✔ dplyr     1.1.4     ✔ readr     2.1.6
 ✔ forcats   1.0.1     ✔ stringr   1.6.0
-✔ ggplot2   4.0.2     ✔ tibble    3.3.1
-✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ ggplot2   4.0.1     ✔ tibble    3.3.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.2
 ✔ purrr     1.2.1     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
@@ -226,12 +226,12 @@ dbl (4): startYear, runtimeMinutes, averageRating, numVotes
 <pre><code># A tibble: 6 × 3
   decade  mean standardDeviation
   &lt;chr&gt;  &lt;dbl&gt;             &lt;dbl&gt;
-1 20s     96.5              26.6
-2 30s     91.3              18.6
-3 40s     96.4              18.9
-4 50s    101.               18.4
-5 60s    102.               20.7
-6 70s    102.               19.1</code></pre>
+1 20s     97.9              26.2
+2 30s     88.6              16.2
+3 40s     98.0              18.8
+4 50s     99.0              18.1
+5 60s    108.               23.0
+6 70s    101.               14.7</code></pre>
 </div>
 </div>
 </section>
@@ -245,12 +245,12 @@ dbl (4): startYear, runtimeMinutes, averageRating, numVotes
 <pre><code># A tibble: 6 × 4
   decade  mean standardDeviation standardError
   &lt;chr&gt;  &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;
-1 20s     96.5              26.6          2.66
-2 30s     91.3              18.6          1.86
-3 40s     96.4              18.9          1.89
-4 50s    101.               18.4          1.84
-5 60s    102.               20.7          2.07
-6 70s    102.               19.1          1.91</code></pre>
+1 20s     97.9              26.2          2.62
+2 30s     88.6              16.2          1.62
+3 40s     98.0              18.8          1.88
+4 50s     99.0              18.1          1.81
+5 60s    108.               23.0          2.30
+6 70s    101.               14.7          1.47</code></pre>
 </div>
 </div>
 </section>
@@ -293,6 +293,10 @@ dbl (4): startYear, runtimeMinutes, averageRating, numVotes
 </div>
 </div>
 </div>
+</section>
+<section id="step-10" class="level2">
+<h2 class="anchored" data-anchor-id="step-10">Step 10</h2>
+<p>The standard error for runtime seems pretty similar compared to the standard error for the first sample for the distribution, the population standard deviation, and the standard deviation for the entire sampling distribution.</p>
 </section>
 </section>
 <section id="challenge-2" class="level1">
@@ -572,11 +576,11 @@ dbl (6): id, height, weight, zombies_killed, years_of_education, age
 <pre><code># A tibble: 5 × 6
   variable             mean standardDeviation standardError CI95Lower CI95Upper
   &lt;chr&gt;               &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1 age                 20.0               2.69         0.380     19.3      20.8 
-2 height              68.1               4.94         0.699     66.7      69.5 
-3 weight             146.               21.7          3.06     140.      152.  
-4 years_of_education   2.78              1.59         0.225      2.34      3.22
-5 zombies_killed       3.04              1.83         0.259      2.53      3.55</code></pre>
+1 age                 20.4               2.98         0.421     19.6      21.2 
+2 height              67.9               5.48         0.775     66.3      69.4 
+3 weight             145.               20.3          2.88     140.      151.  
+4 years_of_education   3.1               1.73         0.245      2.62      3.58
+5 zombies_killed       2.86              1.75         0.247      2.38      3.34</code></pre>
 </div>
 </div>
 </section>
@@ -711,17 +715,17 @@ dbl (6): id, height, weight, zombies_killed, years_of_education, age
 <pre><code># A tibble: 5 × 5
   variable             Mean standardDeviation realCI95Lower realCI95Upper
   &lt;chr&gt;               &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;
-1 age                 20.0              0.433         19.0          20.8 
-2 height              67.7              0.645         66.4          69.0 
-3 weight             144.               2.71         139.          151.  
-4 years_of_education   2.98             0.225          2.52          3.40
-5 zombies_killed       3.00             0.204          2.62          3.36</code></pre>
+1 age                 20.1              0.413         19.2          20.8 
+2 height              67.7              0.601         66.6          68.9 
+3 weight             144.               2.59         139.          149.  
+4 years_of_education   3.00             0.235          2.58          3.48
+5 zombies_killed       2.99             0.237          2.56          3.46</code></pre>
 </div>
 </div>
 <p>The 95% confidence intervals seem pretty similar between the sampling distribution and the individual samples.</p>
 </section>
-<section id="step-10" class="level2">
-<h2 class="anchored" data-anchor-id="step-10">Step 10</h2>
+<section id="step-10-1" class="level2">
+<h2 class="anchored" data-anchor-id="step-10-1">Step 10</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>n_boot <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>boot_height <span class="ot">&lt;-</span> <span class="fu">do</span>(n_boot) <span class="sc">*</span> <span class="fu">mean</span>(<span class="sc">~</span><span class="fu">sample</span>(z_sample<span class="sc">$</span>height, <span class="at">size =</span> <span class="fu">length</span>(z_sample<span class="sc">$</span>height), <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="co"># bootstraps 1000 samples of height taken from our first sample</span></span>
@@ -836,11 +840,11 @@ dbl (6): id, height, weight, zombies_killed, years_of_education, age
 <pre><code># A tibble: 5 × 5
   variable             Mean standardDeviation CI95Lower CI95Upper
   &lt;chr&gt;               &lt;dbl&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1 height              68.1              0.722     66.7      69.6 
-2 weight             146.               3.08     140.      152.  
-3 age                 20.0              0.385     19.2      20.8 
-4 zombies_killed       3.04             0.254      2.56      3.54
-5 years_of_education   2.77             0.229      2.36      3.24</code></pre>
+1 height              67.8              0.776     66.4      69.5 
+2 weight             145.               2.93     139.      151.  
+3 age                 20.4              0.413     19.6      21.2 
+4 zombies_killed       2.86             0.249      2.36      3.34
+5 years_of_education   3.09             0.244      2.62      3.56</code></pre>
 </div>
 </div>
 <p>The confidence intervals generated via bootstrapping are very similar to the CIs generated by sampling distribution in Step 9.</p>

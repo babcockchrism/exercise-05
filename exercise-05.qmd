@@ -88,6 +88,10 @@ samp_p <- ggplot(data = samp_dist, aes(x = mean)) +
 samp_p # plots histograms of the above distributions
 ```
 
+## Step 10
+
+The standard error for runtime seems pretty similar compared to the standard error for the first sample for the distribution, the population standard deviation, and the standard deviation for the entire sampling distribution.
+
 # Challenge 2
 
 ## Step 1
