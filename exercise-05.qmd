@@ -1,0 +1,346 @@
+---
+title: "exercise-05"
+format: html
+---
+
+# Challenge 1
+
+## Step 1
+
+``` {r}
+library(tidyverse)
+d <- tibble(read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/main/IMDB-movies.csv"))
+```
+
+## Step 2
+
+``` {r}
+d <- d %>%
+  filter(startYear >= 1920 & startYear <= 1979 & runtimeMinutes >= 60 & runtimeMinutes <= 180) %>%
+  mutate(decade = paste(floor((startYear/10)) * 10 - 1900, "s", sep = ""))
+```
+
+## Step 3
+
+``` {r}
+p <- ggplot(data = d, aes(x = runtimeMinutes)) +
+  geom_histogram() +
+  facet_wrap(facets = vars(decade))
+p
+```
+
+## Step 4
+
+``` {r}
+results <- d %>%
+  group_by(decade) %>%
+  summarise(mean = mean(runtimeMinutes), standardDeviation = sd(runtimeMinutes))
+results
+```
+
+## Step 5
+
+``` {r}
+samp <- d %>%
+  group_by(decade) %>%
+  slice_sample(n = 100)
+samp_info <- samp %>%
+  summarise(mean = mean(runtimeMinutes), standardDeviation = sd(runtimeMinutes))
+samp_info
+```
+
+## Step 6
+
+``` {r}
+samp_info <- samp_info %>%
+  mutate(standardError = standardDeviation / sqrt(100))
+samp_info
+```
+
+## Step 8
+
+``` {r}
+samp_dist <- tibble(decade = character(), mean = numeric(), standardDeviation = numeric())
+for(i in 1:1000) {
+  samp_1000 <- d %>%
+    group_by(decade) %>%
+    slice_sample(n = 100)
+  samp_1000_info <- samp_1000 %>%
+    group_by(decade) %>%
+    summarise(mean = mean(runtimeMinutes), standardDeviation = sd(runtimeMinutes))
+  samp_dist <- samp_dist %>%
+    add_row(samp_1000_info)
+}
+samp_dist <- samp_dist %>%
+  remove_missing()
+```
+
+## Step 9
+
+``` {r}
+samp_dist_info <- samp_dist %>%
+  group_by(decade) %>%
+  summarise(Mean = mean(mean), standardDeviation = sd(mean))
+samp_p <- ggplot(data = samp_dist, aes(x = mean)) +
+  geom_histogram() +
+  facet_wrap(facets = vars(decade))
+samp_p
+```
+
+# Challenge 2
+
+## Step 1
+
+``` {r}
+z <- tibble(read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/main/zombies.csv"))
+```
+
+## Step 2
+
+``` {r}
+pop_sd <- function(pop) {
+  sd <- sd(pop) * sqrt((length(pop) - 1)/length(pop))
+  return(sd)
+}
+z_long <- z %>%
+  pivot_longer(cols = c("height", "weight", "age", "zombies_killed", "years_of_education"), names_to = "variable", values_to = "value")
+z_info <- z_long %>%
+  group_by(variable) %>%
+  summarise(mean = mean(value), standardDeviation = pop_sd(value))
+```
+
+## Step 3
+
+``` {r}
+z_height <- ggplot(data = z, aes(x = gender, y = height)) +
+  geom_boxplot()
+z_height
+```
+
+``` {r}
+z_weight <- ggplot(data = z, aes(x = gender, y = weight)) +
+  geom_boxplot()
+z_weight
+```
+
+``` {r}
+z_age <- ggplot(data = z, aes(x = gender, y = age)) +
+  geom_boxplot()
+z_age
+```
+
+``` {r}
+z_zombies_killed <- ggplot(data = z, aes(x = gender, y = zombies_killed)) +
+  geom_boxplot()
+z_zombies_killed
+```
+
+``` {r}
+z_years_of_education <- ggplot(data = z, aes(x = gender, y = years_of_education)) +
+  geom_boxplot()
+z_years_of_education
+```
+
+## Step 4
+
+``` {r}
+z_female <- z %>%
+  filter(gender == "Female")
+z_male <- z %>%
+  filter(gender == "Male")
+z_age_height <- ggplot(data = z_female, aes(x = age, y = height)) +
+  geom_point(colour = "pink") +
+  geom_point(data = z_male, colour = "blue")
+z_age_height
+```
+
+``` {r}
+z_age_weight <- ggplot(data = z_female, aes(x = age, y = weight)) +
+  geom_point(colour = "pink") +
+  geom_point(data = z_male, colour = "blue")
+z_age_weight
+```
+
+Height and weight seem to follow similar trends--they're both higher in males, and they increase with age.
+
+## Step 5
+
+``` {r}
+z_height_hist <- ggplot(data = z, aes(x = height)) +
+  geom_histogram()
+z_height_hist
+```
+
+``` {r}
+z_weight_hist <- ggplot(data = z, aes(x = weight)) +
+  geom_histogram()
+z_weight_hist
+```
+
+``` {r}
+z_age_hist <- ggplot(data = z, aes(x = age)) +
+  geom_histogram()
+z_age_hist
+```
+
+``` {r}
+z_zombies_killed_hist <- ggplot(data = z, aes(x = zombies_killed)) +
+  geom_histogram(bins = 10)
+z_zombies_killed_hist
+```
+
+``` {r}
+z_years_of_education_hist <- ggplot(data = z, aes(x = years_of_education)) +
+  geom_histogram(bins = 9)
+z_years_of_education_hist
+```
+
+``` {r}
+z_height_qq <- ggplot(data = z, aes(sample = height)) +
+  geom_qq()
+z_height_qq
+```
+
+``` {r}
+z_weight_qq <- ggplot(data = z, aes(sample = weight)) +
+  geom_qq()
+z_weight_qq
+```
+
+``` {r}
+z_age_qq <- ggplot(data = z, aes(sample = age)) +
+  geom_qq()
+z_age_qq
+```
+
+``` {r}
+z_zombies_killed_qq <- ggplot(data = z, aes(sample = zombies_killed)) +
+  geom_qq()
+z_zombies_killed_qq
+```
+
+``` {r}
+z_years_of_education_qq <- ggplot(data = z, aes(sample = years_of_education)) +
+  geom_qq()
+z_years_of_education_qq
+```
+
+Height, weight, and age seem to be drawn from a normal distribution, while number of zombies killed and years of education do not.
+
+## Step 6
+
+``` {r}
+z_sample <- z %>%
+  slice_sample(n = 50)
+z_sample_long <- z_sample %>%
+  pivot_longer(cols = c("height", "weight", "age", "zombies_killed", "years_of_education"), names_to = "variable", values_to = "value")
+z_sample_info <- z_sample_long %>%
+  group_by(variable) %>%
+  summarise(mean = mean(value), standardDeviation = sd(value), standardError = sd(value)/sqrt(length(value)), CI95Lower = mean + qnorm(0.025) * standardError, CI95Upper = mean + qnorm(0.975) * standardError)
+z_sample_info
+```
+
+## Step 7
+
+``` {r}
+z_dist <- z_sample_info
+for(i in 1:199) {
+  z_200 <- z %>%
+    slice_sample(n = 50)
+  z_200_long <- z_200 %>%
+    pivot_longer(cols = c("height", "weight", "age", "zombies_killed", "years_of_education"), names_to = "variable", values_to = "value")
+  z_200_info <- z_200_long %>%
+    group_by(variable) %>%
+    summarise(mean = mean(value), standardDeviation = sd(value), standardError = sd(value)/sqrt(length(value)), CI95Lower = mean + qnorm(0.025) * standardError, CI95Upper = mean + qnorm(0.975) * standardError)
+  z_dist <- z_dist %>%
+    add_row(z_200_info)
+}
+z_dist_info <- z_dist %>%
+  group_by(variable) %>%
+  summarise(Mean = mean(mean), standardDeviation = sd(mean))
+```
+
+The means of the sampling distribution are similar to the means of the first sample taken, and the sampling distribution's standard deviation is also comparable to the first sample's standard error.
+
+## Step 8
+
+``` {r}
+z_dist_height <- z_dist %>%
+  filter(variable == "height")
+z_dist_height_hist <- ggplot(data = z_dist_height, aes(mean)) +
+  geom_histogram()
+z_dist_height_hist
+```
+
+``` {r}
+z_dist_weight <- z_dist %>%
+  filter(variable == "weight")
+z_dist_weight_hist <- ggplot(data = z_dist_weight, aes(mean)) +
+  geom_histogram()
+z_dist_weight_hist
+```
+
+``` {r}
+z_dist_age <- z_dist %>%
+  filter(variable == "age")
+z_dist_age_hist <- ggplot(data = z_dist_age, aes(mean)) +
+  geom_histogram()
+z_dist_age_hist
+```
+
+``` {r}
+z_dist_zombies_killed <- z_dist %>%
+  filter(variable == "zombies_killed")
+z_dist_zombies_killed_hist <- ggplot(data = z_dist_zombies_killed, aes(mean)) +
+  geom_histogram()
+z_dist_zombies_killed_hist
+```
+
+``` {r}
+z_dist_years_of_education <- z_dist %>%
+  filter(variable == "years_of_education")
+z_dist_years_of_education_hist <- ggplot(data = z_dist_years_of_education, aes(mean)) +
+  geom_histogram()
+z_dist_years_of_education_hist
+```
+
+The variables all seem more normally distributed as sampling distributions.
+
+## Step 9
+
+``` {r}
+z_dist_realCI <- z_dist %>%
+  group_by(variable) %>%
+  summarise(realCI95Lower = quantile(mean, probs = 0.025), realCI95Upper = quantile(mean, probs = 0.975))
+z_dist_real_CI
+```
+
+The 95% confidence intervals seem pretty similar between the sampling distribution and the individual samples.
+
+## Step 10
+
+``` {r}
+bootstrap <- function(data, n_boot = 1000) {
+  boot <- vector(length = n_boot)
+  n <- length(data)
+  for(i in 1:n_boot) {
+    boot[[i]] <- mean(sample(data, n, replace = TRUE))
+    return(boot)
+  }
+}
+z_sample_height <- z_sample_long %>%
+  filter("variable" == "height")
+z_sample_weight <- z_sample_long %>%
+  filter("variable" == "weight")
+z_sample_age <- z_sample_long %>%
+  filter("variable" == "height")
+z_sample_zombies_killed <- z_sample_long %>%
+  filter("variable" == "zombies_killed")
+z_sample_years_of_education <- z_sample_long %>%
+  filter("variable" == "years_of_education")
+
+boot_height <- bootstrap(z_sample_height$value)
+print(z_sample_height$value)
+z_boot <- tibble("variable" = "height", "CI95Lower" = quantile(boot_height, probs = 0.025), "CI95Upper" = quantile(boot_height, probs = 0.975))
+
+```
