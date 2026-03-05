@@ -9,6 +9,7 @@ format: html
 
 ``` {r}
 library(tidyverse)
+library(mosaic)
 d <- tibble(read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/main/IMDB-movies.csv"))
 ```
 
@@ -17,7 +18,7 @@ d <- tibble(read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/mai
 ``` {r}
 d <- d %>%
   filter(startYear >= 1920 & startYear <= 1979 & runtimeMinutes >= 60 & runtimeMinutes <= 180) %>%
-  mutate(decade = paste(floor((startYear/10)) * 10 - 1900, "s", sep = ""))
+  mutate(decade = paste(floor((startYear/10)) * 10 - 1900, "s", sep = "")) # filters the dataset to only include movies with 1-3 hour runtimes and identifies which decade they were released in
 ```
 
 ## Step 3
@@ -26,7 +27,7 @@ d <- d %>%
 p <- ggplot(data = d, aes(x = runtimeMinutes)) +
   geom_histogram() +
   facet_wrap(facets = vars(decade))
-p
+p # histogram of movies between 1 and 3 hours separated by decade
 ```
 
 ## Step 4
@@ -35,7 +36,7 @@ p
 results <- d %>%
   group_by(decade) %>%
   summarise(mean = mean(runtimeMinutes), standardDeviation = sd(runtimeMinutes))
-results
+results # summarizes each decade's runtimes
 ```
 
 ## Step 5
@@ -46,7 +47,7 @@ samp <- d %>%
   slice_sample(n = 100)
 samp_info <- samp %>%
   summarise(mean = mean(runtimeMinutes), standardDeviation = sd(runtimeMinutes))
-samp_info
+samp_info # summarizes runtimes of 100-movie samples from each decade
 ```
 
 ## Step 6
@@ -54,7 +55,7 @@ samp_info
 ``` {r}
 samp_info <- samp_info %>%
   mutate(standardError = standardDeviation / sqrt(100))
-samp_info
+samp_info # added standard error to above table
 ```
 
 ## Step 8
@@ -72,7 +73,7 @@ for(i in 1:1000) {
     add_row(samp_1000_info)
 }
 samp_dist <- samp_dist %>%
-  remove_missing()
+  remove_missing() # logs all samples for the 1000-sample distribution of 100 movies each, for each decade
 ```
 
 ## Step 9
@@ -84,7 +85,7 @@ samp_dist_info <- samp_dist %>%
 samp_p <- ggplot(data = samp_dist, aes(x = mean)) +
   geom_histogram() +
   facet_wrap(facets = vars(decade))
-samp_p
+samp_p # plots histograms of the above distributions
 ```
 
 # Challenge 2
@@ -101,12 +102,12 @@ z <- tibble(read_csv("https://raw.githubusercontent.com/difiore/ada-datasets/mai
 pop_sd <- function(pop) {
   sd <- sd(pop) * sqrt((length(pop) - 1)/length(pop))
   return(sd)
-}
+} # function for converting the native sample standard deviation function to a population standard deviation
 z_long <- z %>%
-  pivot_longer(cols = c("height", "weight", "age", "zombies_killed", "years_of_education"), names_to = "variable", values_to = "value")
+  pivot_longer(cols = c("height", "weight", "age", "zombies_killed", "years_of_education"), names_to = "variable", values_to = "value") # turns each variable we want to look at into one column, which can be filtered by what variable that specific row has in its "value" column using the also-new "variable" column
 z_info <- z_long %>%
   group_by(variable) %>%
-  summarise(mean = mean(value), standardDeviation = pop_sd(value))
+  summarise(mean = mean(value), standardDeviation = pop_sd(value)) # generates a table that gives a brief summary of the entire table's/population's different quantized attributes
 ```
 
 ## Step 3
@@ -114,7 +115,7 @@ z_info <- z_long %>%
 ``` {r}
 z_height <- ggplot(data = z, aes(x = gender, y = height)) +
   geom_boxplot()
-z_height
+z_height # boxplot for height, separated by gender
 ```
 
 ``` {r}
@@ -151,7 +152,7 @@ z_male <- z %>%
 z_age_height <- ggplot(data = z_female, aes(x = age, y = height)) +
   geom_point(colour = "pink") +
   geom_point(data = z_male, colour = "blue")
-z_age_height
+z_age_height # scatterplot of height; the different colors differentiate gender for each subject
 ```
 
 ``` {r}
@@ -168,7 +169,7 @@ Height and weight seem to follow similar trends--they're both higher in males, a
 ``` {r}
 z_height_hist <- ggplot(data = z, aes(x = height)) +
   geom_histogram()
-z_height_hist
+z_height_hist # histogram of the entire population's heights
 ```
 
 ``` {r}
@@ -198,7 +199,7 @@ z_years_of_education_hist
 ``` {r}
 z_height_qq <- ggplot(data = z, aes(sample = height)) +
   geom_qq()
-z_height_qq
+z_height_qq # quantile-quantile plot of the entire population's heights. The X-axis is what the expected value for a given subject percentile's height would be, assuming the data is normally distributed; the Y-axis is the actual value for that subject percentile's height. The more linear the graph is, the more normal the distribution.
 ```
 
 ``` {r}
@@ -237,7 +238,7 @@ z_sample_long <- z_sample %>%
 z_sample_info <- z_sample_long %>%
   group_by(variable) %>%
   summarise(mean = mean(value), standardDeviation = sd(value), standardError = sd(value)/sqrt(length(value)), CI95Lower = mean + qnorm(0.025) * standardError, CI95Upper = mean + qnorm(0.975) * standardError)
-z_sample_info
+z_sample_info # summarizes the variables of a 50-subject sample
 ```
 
 ## Step 7
@@ -254,10 +255,10 @@ for(i in 1:199) {
     summarise(mean = mean(value), standardDeviation = sd(value), standardError = sd(value)/sqrt(length(value)), CI95Lower = mean + qnorm(0.025) * standardError, CI95Upper = mean + qnorm(0.975) * standardError)
   z_dist <- z_dist %>%
     add_row(z_200_info)
-}
+} # table containing all the info from the sampling distribution
 z_dist_info <- z_dist %>%
   group_by(variable) %>%
-  summarise(Mean = mean(mean), standardDeviation = sd(mean))
+  summarise(Mean = mean(mean), standardDeviation = sd(mean)) # summary of the sampling distribution's variables
 ```
 
 The means of the sampling distribution are similar to the means of the first sample taken, and the sampling distribution's standard deviation is also comparable to the first sample's standard error.
@@ -268,15 +269,19 @@ The means of the sampling distribution are similar to the means of the first sam
 z_dist_height <- z_dist %>%
   filter(variable == "height")
 z_dist_height_hist <- ggplot(data = z_dist_height, aes(mean)) +
-  geom_histogram()
-z_dist_height_hist
+  geom_histogram() +
+  geom_vline(xintercept = quantile(z_dist_height$mean, probs = 0.025)) +
+  geom_vline(xintercept = quantile(z_dist_height$mean, probs = 0.975))
+z_dist_height_hist # histogram of the sampling distribution's sample means for height with empirically determined 95% confidence intervals included
 ```
 
 ``` {r}
 z_dist_weight <- z_dist %>%
   filter(variable == "weight")
 z_dist_weight_hist <- ggplot(data = z_dist_weight, aes(mean)) +
-  geom_histogram()
+  geom_histogram() +
+  geom_vline(xintercept = quantile(z_dist_weight$mean, probs = 0.025)) +
+  geom_vline(xintercept = quantile(z_dist_weight$mean, probs = 0.975))
 z_dist_weight_hist
 ```
 
@@ -284,7 +289,9 @@ z_dist_weight_hist
 z_dist_age <- z_dist %>%
   filter(variable == "age")
 z_dist_age_hist <- ggplot(data = z_dist_age, aes(mean)) +
-  geom_histogram()
+  geom_histogram() +
+  geom_vline(xintercept = quantile(z_dist_age$mean, probs = 0.025)) +
+  geom_vline(xintercept = quantile(z_dist_age$mean, probs = 0.975))
 z_dist_age_hist
 ```
 
@@ -292,7 +299,9 @@ z_dist_age_hist
 z_dist_zombies_killed <- z_dist %>%
   filter(variable == "zombies_killed")
 z_dist_zombies_killed_hist <- ggplot(data = z_dist_zombies_killed, aes(mean)) +
-  geom_histogram()
+  geom_histogram() +
+  geom_vline(xintercept = quantile(z_dist_zombies_killed$mean, probs = 0.025)) +
+  geom_vline(xintercept = quantile(z_dist_zombies_killed$mean, probs = 0.975))
 z_dist_zombies_killed_hist
 ```
 
@@ -300,7 +309,9 @@ z_dist_zombies_killed_hist
 z_dist_years_of_education <- z_dist %>%
   filter(variable == "years_of_education")
 z_dist_years_of_education_hist <- ggplot(data = z_dist_years_of_education, aes(mean)) +
-  geom_histogram()
+  geom_histogram() +
+  geom_vline(xintercept = quantile(z_dist_years_of_education$mean, probs = 0.025)) +
+  geom_vline(xintercept = quantile(z_dist_years_of_education$mean, probs = 0.975))
 z_dist_years_of_education_hist
 ```
 
@@ -311,8 +322,8 @@ The variables all seem more normally distributed as sampling distributions.
 ``` {r}
 z_dist_realCI <- z_dist %>%
   group_by(variable) %>%
-  summarise(realCI95Lower = quantile(mean, probs = 0.025), realCI95Upper = quantile(mean, probs = 0.975))
-z_dist_real_CI
+  summarise(Mean = mean(mean), standardDeviation = sd(mean), realCI95Lower = quantile(mean, probs = 0.025), realCI95Upper = quantile(mean, probs = 0.975))
+z_dist_realCI # table containing empirically determined values for each variable's 95% confidence intervals
 ```
 
 The 95% confidence intervals seem pretty similar between the sampling distribution and the individual samples.
@@ -320,27 +331,70 @@ The 95% confidence intervals seem pretty similar between the sampling distributi
 ## Step 10
 
 ``` {r}
-bootstrap <- function(data, n_boot = 1000) {
-  boot <- vector(length = n_boot)
-  n <- length(data)
-  for(i in 1:n_boot) {
-    boot[[i]] <- mean(sample(data, n, replace = TRUE))
-    return(boot)
-  }
-}
-z_sample_height <- z_sample_long %>%
-  filter("variable" == "height")
-z_sample_weight <- z_sample_long %>%
-  filter("variable" == "weight")
-z_sample_age <- z_sample_long %>%
-  filter("variable" == "height")
-z_sample_zombies_killed <- z_sample_long %>%
-  filter("variable" == "zombies_killed")
-z_sample_years_of_education <- z_sample_long %>%
-  filter("variable" == "years_of_education")
-
-boot_height <- bootstrap(z_sample_height$value)
-print(z_sample_height$value)
-z_boot <- tibble("variable" = "height", "CI95Lower" = quantile(boot_height, probs = 0.025), "CI95Upper" = quantile(boot_height, probs = 0.975))
-
+n_boot <- 1000
+boot_height <- do(n_boot) * mean(~sample(z_sample$height, size = length(z_sample$height), replace = TRUE)) # bootstraps 1000 samples of height taken from our first sample
+lower_boot_height <- quantile(boot_height$mean, probs = 0.025)
+upper_boot_height <- quantile(boot_height$mean, probs = 0.975)
+boot_height_plot <- ggplot(data = boot_height, aes(mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = lower_boot_height) +
+  geom_vline(xintercept = upper_boot_height)
+boot_height_plot # histogram of the bootstrap sample means with empirically determined 95% confidence intervals
 ```
+
+``` {r}
+boot_weight <- do(n_boot) * mean(~sample(z_sample$weight, size = length(z_sample$weight), replace = TRUE))
+lower_boot_weight <- quantile(boot_weight$mean, probs = 0.025)
+upper_boot_weight <- quantile(boot_weight$mean, probs = 0.975)
+boot_weight_plot <- ggplot(data = boot_weight, aes(mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = lower_boot_weight) +
+  geom_vline(xintercept = upper_boot_weight)
+boot_weight_plot
+```
+
+``` {r}
+boot_age <- do(n_boot) * mean(~sample(z_sample$age, size = length(z_sample$age), replace = TRUE))
+lower_boot_age <- quantile(boot_age$mean, probs = 0.025)
+upper_boot_age <- quantile(boot_age$mean, probs = 0.975)
+boot_age_plot <- ggplot(data = boot_age, aes(mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = lower_boot_age) +
+  geom_vline(xintercept = upper_boot_age)
+boot_age_plot
+```
+
+``` {r}
+boot_zombies_killed <- do(n_boot) * mean(~sample(z_sample$zombies_killed, size = length(z_sample$zombies_killed), replace = TRUE))
+lower_boot_zombies_killed <- quantile(boot_zombies_killed$mean, probs = 0.025)
+upper_boot_zombies_killed <- quantile(boot_zombies_killed$mean, probs = 0.975)
+boot_zombies_killed_plot <- ggplot(data = boot_zombies_killed, aes(mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = lower_boot_zombies_killed) +
+  geom_vline(xintercept = upper_boot_zombies_killed)
+boot_zombies_killed_plot
+```
+
+``` {r}
+boot_years_of_education <- do(n_boot) * mean(~sample(z_sample$years_of_education, size = length(z_sample$years_of_education), replace = TRUE))
+lower_boot_years_of_education <- quantile(boot_years_of_education$mean, probs = 0.025)
+upper_boot_years_of_education <- quantile(boot_years_of_education$mean, probs = 0.975)
+boot_years_of_education_plot <- ggplot(data = boot_years_of_education, aes(mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = lower_boot_years_of_education) +
+  geom_vline(xintercept = upper_boot_years_of_education)
+boot_years_of_education_plot
+```
+
+``` {r}
+z_boot_info <- tibble(
+  variable = c("height", "weight", "age", "zombies_killed", "years_of_education"),
+  Mean = c(mean(boot_height$mean), mean(boot_weight$mean), mean(boot_age$mean), mean(boot_zombies_killed$mean), mean(boot_years_of_education$mean)),
+  standardDeviation = c(sd(boot_height$mean), sd(boot_weight$mean), sd(boot_age$mean), sd(boot_zombies_killed$mean), sd(boot_years_of_education$mean)),
+  CI95Lower = c(lower_boot_height, lower_boot_weight, lower_boot_age, lower_boot_zombies_killed, lower_boot_years_of_education),
+  CI95Upper = c(upper_boot_height, upper_boot_weight, upper_boot_age, upper_boot_zombies_killed, upper_boot_years_of_education)
+)
+z_boot_info # table containing info about the bootstrapped sample distribution
+```
+
+The confidence intervals generated via bootstrapping are very similar to the CIs generated by sampling distribution in Step 9.
